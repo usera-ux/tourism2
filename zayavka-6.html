@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BMC Tourism — Инвестировать в проект</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #111111;
+      --white: #ffffff;
+      --orange: #FFA03F;
+      --border: #e2e2e2;
+      --input-bg: #fff;
+    }
+    html, body {
+      background: var(--white);
+      color: var(--black);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ══ NAV ══ */
+    nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      height: 70px; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 56px;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .logo { display: flex; flex-direction: column; line-height: 1.2; }
+    .logo-main { font-size: 17px; font-weight: 800; letter-spacing: -0.2px; color: var(--black); }
+    .logo-main em { font-style: normal; color: var(--orange); }
+    .logo-sub { font-size: 10px; font-weight: 500; color: #aaa; margin-top: 1px; }
+
+    .nav-links {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 38px; list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none; color: var(--black);
+      font-size: 15px; font-weight: 600; transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--orange); }
+    .nav-links li.active a { color: var(--orange); }
+
+    /* dashed arc + plane */
+    .nav-deco {
+      position: absolute; top: 6px; right: 76px;
+      width: 130px; height: 100px; pointer-events: none;
+    }
+
+    .burger {
+      display: flex; flex-direction: column; gap: 5px; cursor: pointer;
+      padding: 6px; border: none; background: none; position: relative; z-index: 1;
+    }
+    .burger span {
+      display: block; height: 2.5px; background: var(--black); border-radius: 2px;
+      transition: transform 0.25s, width 0.25s;
+    }
+    .burger span:first-child { width: 26px; }
+    .burger span:last-child  { width: 16px; }
+    .burger.open span:first-child { width: 26px; transform: translateY(7.5px) rotate(45deg); }
+    .burger.open span:last-child  { width: 26px; transform: translateY(-7.5px) rotate(-45deg); }
+
+    .mobile-drawer {
+      display: none; position: fixed;
+      top: 70px; left: 0; right: 0;
+      background: var(--white); border-bottom: 1px solid rgba(0,0,0,0.07);
+      padding: 24px 28px; z-index: 190; flex-direction: column;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .mobile-drawer.open { display: flex; }
+    .mobile-drawer a {
+      text-decoration: none; color: var(--black);
+      font-size: 17px; font-weight: 600;
+      padding: 14px 0; border-bottom: 1px solid rgba(0,0,0,0.06);
+      transition: color 0.15s;
+    }
+    .mobile-drawer a:last-child { border-bottom: none; }
+    .mobile-drawer a:hover { color: var(--orange); }
+
+    /* ══ FORM PAGE ══ */
+    .form-page {
+      min-height: 100vh;
+      padding: 120px 56px 80px;
+      max-width: 1060px;
+    }
+
+    .form-heading {
+      font-size: clamp(28px, 3.5vw, 42px);
+      font-weight: 900;
+      letter-spacing: -1.2px;
+      color: var(--black);
+      margin-bottom: 10px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.1s forwards;
+    }
+
+    .form-subheading {
+      font-size: 14.5px;
+      color: #888;
+      line-height: 1.55;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s forwards;
+    }
+
+    /* ══ FORM ══ */
+    .invest-form {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.3s forwards;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--black);
+      letter-spacing: -0.1px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 14.5px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      color: var(--black);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder { color: #bbb; }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(232,100,10,0.10);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 120px;
+      line-height: 1.55;
+    }
+
+    /* Custom select arrow */
+    .select-wrap {
+      position: relative;
+    }
+    .select-wrap select { padding-right: 44px; cursor: pointer; color: #bbb; }
+    .select-wrap select.has-value { color: var(--black); }
+    .select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #aaa;
+      pointer-events: none;
+    }
+
+    .submit-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--orange);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 18px 52px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      width: fit-content;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 6px 20px rgba(232,100,10,0.3);
+      margin-top: 8px;
+    }
+    .submit-btn:hover { background: #c9530a; transform: translateY(-2px); box-shadow: 0 10px 28px rgba(232,100,10,0.4); }
+    .submit-btn:active { transform: translateY(0); }
+
+    /* Success message */
+    .success-msg {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      background: #f0faf4;
+      border: 1.5px solid #4caf50;
+      border-radius: 10px;
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #2e7d32;
+    }
+    .success-msg svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    /* ══ KEYFRAMES ══ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 860px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none !important; }
+      .nav-deco { display: none; }
+      .form-page { padding: 100px 20px 60px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+
+<nav>
+  <div class="logo">
+    <div class="logo-main">BMC<em>Tourism</em></div>
+    <div class="logo-sub">туристская сеть</div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="./index.html">Главная</a></li>
+    <li><a href="./direction-3.html">Направления</a></li>
+    <li><a href="./hotels.html">Отели</a></li>
+    <li class="active"><a href="./investment-5.html">Инвестиции</a></li>
+    <li><a href="./region-2.html">О нас</a></li>
+  </ul>
+
+  <svg class="nav-deco" viewBox="0 0 130 100" fill="none">
+    <path d="M118 8 C88 1, 28 8, 8 46 C-3 66, 8 86, 26 94"
+      stroke="#111" stroke-opacity="0.35" stroke-width="1.6"
+      stroke-dasharray="6 5" stroke-linecap="round"/>
+    <g transform="translate(112,5) rotate(-30)">
+      <path d="M0 0 L-15 5 L-12 0 L-15 -5 Z" fill="#222"/>
+      <path d="M-7 -1 L-17 -9 L-15 -1 L-17 8 Z" fill="#222"/>
+      <path d="M-12 3 L-16 7 L-14 3 Z" fill="#222"/>
+    </g>
+  </svg>
+
+  <button class="burger" id="burger" aria-label="Меню">
+    <span></span><span></span>
+  </button>
+</nav>
+
+<nav class="mobile-drawer" id="drawer">
+  <a href="./index.html">Главная</a>
+  <a href="./direction-3.html">Направления</a>
+  <a href="./hotels.html">Отели</a>
+  <a href="./investment-5.html">Инвестиции</a>
+  <a href="./region-2.html">О нас</a>
+</nav>
+
+
+<div class="form-page">
+  <h1 class="form-heading">Инвестировать в проект</h1>
+  <p class="form-subheading">Заполните данные, чтобы получить персональное предложение и стать инвестором</p>
+
+  <div class="invest-form" id="investForm">
+
+    <div class="form-row">
+      <div class="field">
+        <label for="firstName">Имя</label>
+        <input type="text" id="firstName" placeholder="Placeholder" />
+      </div>
+      <div class="field">
+        <label for="lastName">Фамилия</label>
+        <input type="text" id="lastName" placeholder="Placeholder" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="phone">Телефон</label>
+      <input type="tel" id="phone" placeholder="+7 707 321 3447" />
+    </div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Placeholder" />
+    </div>
+
+    <div class="field">
+      <label for="project">Выбор проекта</label>
+      <div class="select-wrap">
+        <select id="project" onchange="this.classList.toggle('has-value', this.value !== '')">
+          <option value="" disabled selected>Placeholder</option>
+          <option value="burabay">Эко-отель «Burabay Hills»</option>
+          <option value="kolsai">Глэмпинг «Kolsai Resort»</option>
+          <option value="altyn">Altyn-Emel Eco Camp</option>
+          <option value="altai">Горный лодж «Altai View»</option>
+          <option value="caspian">«Caspian Coast»</option>
+          <option value="charyn">Charyn Village</option>
+          <option value="turkestan">Turkestan Heritage</option>
+          <option value="mangystau">Mangystau Canyon Resort</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="amount">Сумма инвестиций</label>
+      <input type="text" id="amount" placeholder="Placeholder" />
+    </div>
+
+    <div class="field">
+      <label for="comment">Комментарий</label>
+      <textarea id="comment" placeholder="Placeholder"></textarea>
+    </div>
+
+    <div class="success-msg" id="successMsg">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#4caf50" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+      Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.
+    </div>
+
+    <button class="submit-btn" onclick="handleSubmit()">Отправить заявку</button>
+
+  </div>
+</div>
+
+
+<footer class="footer">
+  <div class="footer-main">
+
+    <div class="footer-brand">
+      <div class="footer-logo">BMC<em>Tourism</em></div>
+      <p class="footer-about">Инвестируйте в развитие туризма Казахстана и получайте доход от реальных туристических объектов с прозрачным цифровым контролем.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="#" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+        <a href="#" aria-label="Twitter">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Сервисы</h4>
+      <ul class="footer-links">
+        <li><a href="#">О нас</a></li>
+        <li><a href="#">Направления</a></li>
+        <li><a href="#">Отели</a></li>
+        <li><a href="#">Наш блог</a></li>
+        <li><a href="#">Связаться с нами</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Instagram</h4>
+      <div class="footer-insta">
+        <a href="#"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=120&q=75" alt="" /></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=120&q=75" alt="" /></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1519817650390-64a93db51149?w=120&q=75" alt="" /></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=120&q=75" alt="" /></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=120&q=75" alt="" /></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1467377791767-c929b5dc9a23?w=120&q=75" alt="" /></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Контакты</h4>
+      <ul class="footer-contacts">
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Астана, Казахстан
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.64 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.55 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 5.94 5.94l1.28-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          +7 (717) 123-45-67
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          info@bmctourism.kz
+        </li>
+      </ul>
+    </div>
+
+  </div>
+  <div class="footer-bottom">
+    <span>BMCTourism © 2024 — все права защищены</span>
+  </div>
+</footer>
+
+<style>
+  .footer { background: var(--orange); color: #fff; }
+  .footer-main { display: grid; grid-template-columns: 1.6fr 1fr 1.4fr 1.2fr; gap: 48px; padding: 64px 56px 56px; }
+  .footer-logo { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: #fff; margin-bottom: 16px; }
+  .footer-logo em { font-style: normal; opacity: 0.75; }
+  .footer-about { font-size: 13.5px; line-height: 1.65; color: rgba(255,255,255,0.82); margin-bottom: 28px; max-width: 280px; }
+  .footer-socials { display: flex; gap: 14px; }
+  .footer-socials a { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: #fff; transition: background 0.2s, transform 0.15s; text-decoration: none; }
+  .footer-socials a:hover { background: rgba(255,255,255,0.35); transform: translateY(-2px); }
+  .footer-socials svg { width: 16px; height: 16px; }
+  .footer-col-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 22px; }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .footer-links a { text-decoration: none; font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.82); transition: color 0.15s; }
+  .footer-links a:hover { color: #fff; }
+  .footer-insta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .footer-insta a { display: block; border-radius: 10px; overflow: hidden; aspect-ratio: 1; transition: transform 0.2s, opacity 0.2s; }
+  .footer-insta a:hover { transform: scale(1.05); opacity: 0.9; }
+  .footer-insta img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .footer-contacts { list-style: none; display: flex; flex-direction: column; gap: 18px; }
+  .footer-contacts li { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.88); line-height: 1.4; }
+  .footer-contacts svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; stroke: rgba(255,255,255,0.9); }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.2); padding: 20px 56px; text-align: center; font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500; }
+  @media (max-width: 1000px) { .footer-main { grid-template-columns: 1fr 1fr; gap: 40px; } }
+  @media (max-width: 600px) { .footer-main { grid-template-columns: 1fr; padding: 48px 20px 40px; } .footer-bottom { padding: 18px 20px; } }
+</style>
+
+<script>
+  /* Burger */
+  const burger = document.getElementById('burger');
+  const drawer = document.getElementById('drawer');
+  burger.addEventListener('click', () => {
+    const open = drawer.classList.toggle('open');
+    burger.classList.toggle('open', open);
+  });
+
+  /* Form submit */
+  function handleSubmit() {
+    const fields = ['firstName', 'lastName', 'phone', 'email', 'project', 'amount'];
+    let valid = true;
+
+    fields.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) {
+        el.style.borderColor = '#f44336';
+        el.style.boxShadow = '0 0 0 3px rgba(244,67,54,0.10)';
+        valid = false;
+        el.addEventListener('input', () => {
+          el.style.borderColor = '';
+          el.style.boxShadow = '';
+        }, { once: true });
+      }
+    });
+
+    if (!valid) return;
+
+    const btn = document.querySelector('.submit-btn');
+    btn.textContent = 'Отправка...';
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+
+    setTimeout(() => {
+      btn.style.display = 'none';
+      const msg = document.getElementById('successMsg');
+      msg.style.display = 'flex';
+    }, 800);
+  }
+
+  /* Phone mask */
+  document.getElementById('phone').addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '');
+    if (v.startsWith('7') || v.startsWith('8')) v = v.slice(1);
+    let out = '+7';
+    if (v.length > 0) out += ' ' + v.substring(0, 3);
+    if (v.length >= 4) out += ' ' + v.substring(3, 6);
+    if (v.length >= 7) out += ' ' + v.substring(6, 8);
+    if (v.length >= 9) out += ' ' + v.substring(8, 10);
+    this.value = out;
+  });
+
+  /* Amount formatting */
+  document.getElementById('amount').addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '');
+    if (v) this.value = Number(v).toLocaleString('ru-RU') + ' ₸';
+    else this.value = '';
+  });
+</script>
+</body>
+</html>

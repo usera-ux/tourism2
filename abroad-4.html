@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BMC Tourism — Зарубежные направления</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #111111;
+      --white: #ffffff;
+      --orange: #e8640a;
+    }
+    html, body {
+      background: var(--white);
+      color: var(--black);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ══ NAV ══ */
+    nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      height: 70px;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 56px;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(10px);
+    }
+    .logo { display: flex; flex-direction: column; line-height: 1.2; }
+    .logo-main { font-size: 17px; font-weight: 800; letter-spacing: -0.2px; color: var(--black); }
+    .logo-main em { font-style: normal; color: var(--orange); }
+    .logo-sub { font-size: 10px; font-weight: 500; color: #aaa; margin-top: 1px; }
+
+    .nav-links {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 38px; list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none; color: var(--black);
+      font-size: 15px; font-weight: 600; transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--orange); }
+
+    /* dashed arc + plane */
+    .nav-deco {
+      position: absolute;
+      top: 8px; right: 76px;
+      width: 120px; height: 90px;
+      pointer-events: none;
+    }
+
+    .burger {
+      display: flex; flex-direction: column; gap: 5px; cursor: pointer;
+      padding: 6px; border: none; background: none; position: relative; z-index: 1;
+    }
+    .burger span {
+      display: block; height: 2.5px; background: var(--black); border-radius: 2px;
+      transition: transform 0.25s, width 0.25s;
+    }
+    .burger span:first-child { width: 26px; }
+    .burger span:last-child  { width: 16px; }
+    .burger.open span:first-child { width: 26px; transform: translateY(7.5px) rotate(45deg); }
+    .burger.open span:last-child  { width: 26px; transform: translateY(-7.5px) rotate(-45deg); }
+
+    .mobile-drawer {
+      display: none; position: fixed;
+      top: 70px; left: 0; right: 0;
+      background: var(--white); border-bottom: 1px solid rgba(0,0,0,0.07);
+      padding: 24px 28px; z-index: 190;
+      flex-direction: column;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .mobile-drawer.open { display: flex; }
+    .mobile-drawer a {
+      text-decoration: none; color: var(--black);
+      font-size: 17px; font-weight: 600;
+      padding: 14px 0; border-bottom: 1px solid rgba(0,0,0,0.06);
+      transition: color 0.15s;
+    }
+    .mobile-drawer a:last-child { border-bottom: none; }
+    .mobile-drawer a:hover { color: var(--orange); }
+
+    /* ══ HERO ══ */
+    .hero {
+      margin-top: 70px;
+      position: relative;
+      width: 100%;
+      height: 400px;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 40%;
+      display: block;
+    }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.38);
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 40px;
+      text-align: center;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.2s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+    .hero-title {
+      font-size: clamp(26px, 4vw, 52px);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -1px;
+      color: #fff;
+      max-width: 720px;
+    }
+
+    /* ══ FOREIGN SLIDER ══ */
+    .foreign {
+      padding: 56px 56px 72px;
+      background: #fff;
+    }
+    .foreign-label {
+      font-size: 12px; font-weight: 600;
+      color: var(--orange); margin-bottom: 7px;
+    }
+    .foreign-heading {
+      font-size: clamp(22px, 2.8vw, 34px);
+      font-weight: 800; letter-spacing: -0.7px;
+      margin-bottom: 36px; color: var(--black);
+    }
+
+    .foreign-slider { position: relative; }
+    .foreign-track-wrap { overflow: hidden; }
+    .foreign-track {
+      display: flex; gap: 20px;
+      transition: transform 0.45s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    .fcard { flex: 0 0 calc(20% - 16px); cursor: pointer; }
+
+    .fcard-img {
+      position: relative;
+      width: 100%; aspect-ratio: 3/3.5;
+      border-radius: 18px; overflow: hidden; margin-bottom: 14px;
+    }
+    .fcard-img img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.5s ease;
+    }
+    .fcard:hover .fcard-img img { transform: scale(1.06); }
+
+    .fcard-pin {
+      position: absolute;
+      top: 14px; left: 90%; transform: translateX(-50%);
+      width: 22px; height: 22px;
+      background: #fff; border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+
+    .fcard-body h3 {
+      font-size: 15px; font-weight: 800;
+      letter-spacing: -0.3px; margin-bottom: 6px;
+      color: var(--black); line-height: 1.2;
+    }
+    .fcard-body p {
+      font-size: 12.5px; color: #777;
+      line-height: 1.55; font-weight: 400;
+    }
+
+    .farrow {
+      position: absolute;
+      top: 38%; transform: translateY(-50%);
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--orange); color: #fff; border: none;
+      font-size: 22px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10; box-shadow: 0 4px 16px rgba(232,100,10,0.35);
+      transition: background 0.2s, transform 0.15s; user-select: none;
+    }
+    .farrow:hover { background: #c9530a; transform: translateY(-50%) scale(1.08); }
+    .farrow.fprev { left: -22px; }
+    .farrow.fnext { right: -22px; }
+
+    @media (max-width: 1000px) {
+      .fcard { flex: 0 0 calc(33.333% - 14px); }
+    }
+    @media (max-width: 640px) {
+      .foreign { padding: 40px 20px 56px; }
+      .fcard { flex: 0 0 calc(80% - 10px); }
+      .farrow.fprev { left: -10px; }
+      .farrow.fnext { right: -10px; }
+    }
+
+    /* ══ TRENDING ══ */
+    .trending {
+      padding: 56px 56px 72px;
+      background: #fff;
+    }
+    .trending-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+    .trending-title {
+      font-size: clamp(22px, 2.8vw, 34px);
+      font-weight: 800; letter-spacing: -0.7px;
+      color: var(--black);
+    }
+    .trending-see-all {
+      font-size: 14px; font-weight: 600;
+      color: #555; text-decoration: none;
+      transition: color 0.15s;
+    }
+    .trending-see-all:hover { color: var(--orange); }
+
+    /* asymmetric grid: left 2-col, right 1 tall card */
+    .trending-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 12px;
+    }
+
+    .tcard {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .tcard img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.5s ease;
+    }
+    .tcard:hover img { transform: scale(1.06); }
+
+    .tcard-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 50%);
+    }
+    .tcard-label {
+      position: absolute;
+      bottom: 14px; left: 14px;
+      color: #fff; font-size: 14px; font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+
+    /* Cruises — top-left, spans 1 col */
+    .tcard-cruises {
+      grid-column: 1; grid-row: 1;
+      height: 200px;
+    }
+    /* Beach Tours — top-middle, spans 2 cols */
+    .tcard-beach {
+      grid-column: 2 / 4; grid-row: 1;
+      height: 200px;
+    }
+    /* City Tours — right, spans 2 rows */
+    .tcard-city {
+      grid-column: 4; grid-row: 1 / 3;
+      height: 412px;
+    }
+    /* Museum Tour — bottom-left */
+    .tcard-museum {
+      grid-column: 1; grid-row: 2;
+      height: 200px;
+    }
+    /* Food — bottom-middle-left */
+    .tcard-food {
+      grid-column: 2; grid-row: 2;
+      height: 200px;
+    }
+    /* Hiking — bottom-middle-right */
+    .tcard-hiking {
+      grid-column: 3; grid-row: 2;
+      height: 200px;
+    }
+
+    @media (max-width: 860px) {
+      .trending { padding: 40px 20px 56px; }
+      .trending-grid { grid-template-columns: 1fr 1fr; grid-template-rows: none; }
+      .tcard-cruises, .tcard-beach, .tcard-city,
+      .tcard-museum, .tcard-food, .tcard-hiking {
+        grid-column: auto; grid-row: auto; height: 160px;
+      }
+    }
+
+    /* ══ FOOTER ══ */
+    .site-footer { background: #FFA03F; color: #fff; }
+    .footer-inner {
+      max-width: 1545px; margin: 0 auto;
+      padding: 56px 56px 40px;
+      display: grid;
+      grid-template-columns: 1.6fr 0.9fr 1.4fr 1.1fr;
+      gap: 40px;
+    }
+    .footer-logo {
+      font-size: 24px; font-weight: 800;
+      letter-spacing: -0.3px; margin-bottom: 14px; color: #fff;
+    }
+    .footer-desc {
+      font-size: 13px; line-height: 1.65;
+      color: rgba(255,255,255,0.88); max-width: 260px; margin-bottom: 24px;
+    }
+    .footer-socials { display: flex; gap: 18px; }
+    .footer-socials a {
+      color: #fff; display: flex; align-items: center;
+      justify-content: center; transition: opacity 0.2s;
+    }
+    .footer-socials a:hover { opacity: 0.7; }
+    .footer-socials svg { width: 22px; height: 22px; }
+    .footer-col-title {
+      font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 20px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 13px; }
+    .footer-col a {
+      text-decoration: none; color: rgba(255,255,255,0.88);
+      font-size: 14px; font-weight: 500; transition: color 0.15s;
+    }
+    .footer-col a:hover { color: #fff; }
+    .footer-insta {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    }
+    .footer-insta a { display: block; aspect-ratio: 1; border-radius: 10px; overflow: hidden; }
+    .footer-insta img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform 0.4s;
+    }
+    .footer-insta a:hover img { transform: scale(1.08); }
+    .footer-contacts { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+    .footer-contacts li {
+      display: flex; align-items: flex-start; gap: 12px;
+      color: rgba(255,255,255,0.92); font-size: 14px; font-weight: 500;
+    }
+    .footer-contacts svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+    .footer-bottom-bar {
+      background: rgba(0,0,0,0.07);
+      text-align: center; padding: 16px 56px;
+    }
+    .footer-bottom-bar p { font-size: 13px; color: rgba(255,255,255,0.75); }
+
+    @media (max-width: 1000px) {
+      .footer-inner { grid-template-columns: 1fr 1fr; padding: 40px 20px 28px; }
+    }
+    @media (max-width: 560px) {
+      .footer-inner { grid-template-columns: 1fr; }
+      .footer-bottom-bar { padding: 14px 20px; }
+    }
+
+    /* ══ KEYFRAMES ══ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 860px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none !important; }
+      .nav-deco { display: none; }
+      .hero { height: 280px; }
+      .hero-title { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+
+<nav>
+  <div class="logo">
+    <div class="logo-main">BMC<em>Tourism</em></div>
+    <div class="logo-sub">туристская сеть</div>
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="./index.html">Главная</a></li>
+    <li><a href="./direction-3.html">Направления</a></li>
+    <li><a href="./hotels.html">Отели</a></li>
+    <li><a href="./investment-5.html">Инвестиции</a></li>
+    <li><a href="./region-2.html">О нас</a></li>
+  </ul>
+
+  <svg class="nav-deco" viewBox="0 0 120 90" fill="none">
+    <path d="M108 7 C80 1, 25 7, 7 42 C-3 60, 8 78, 24 84"
+      stroke="#111" stroke-opacity="0.38" stroke-width="1.6"
+      stroke-dasharray="6 5" stroke-linecap="round"/>
+    <g transform="translate(102,5) rotate(-30)">
+      <path d="M0 0 L-15 5 L-12 0 L-15 -5 Z" fill="#222"/>
+      <path d="M-7 -1 L-17 -9 L-15 -1 L-17 8 Z" fill="#222"/>
+      <path d="M-12 3 L-16 7 L-14 3 Z" fill="#222"/>
+    </g>
+  </svg>
+
+  <button class="burger" id="burger" aria-label="Меню">
+    <span></span><span></span>
+  </button>
+</nav>
+
+<nav class="mobile-drawer" id="drawer">
+  <a href="./index.html">Главная</a>
+  <a href="./direction-3.html">Направления</a>
+  <a href="./hotels.html">Отели</a>
+  <a href="./investment-5.html">Инвестиции</a>
+  <a href="./region-2.html">О нас</a>
+</nav>
+
+
+<section class="hero">
+  <img
+    class="hero-bg"
+    src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=85"
+    alt="Зарубежные направления"
+  />
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1 class="hero-title">
+      Лучшие зарубежные направления<br>для отдыха
+    </h1>
+  </div>
+</section>
+
+
+<section class="foreign">
+  <p class="foreign-label">Лучшие направления</p>
+  <h2 class="foreign-heading">Лучшие зарубежные направления</h2>
+
+  <div class="foreign-slider">
+    <button class="farrow fprev" id="fPrev">&#8249;</button>
+    <div class="foreign-track-wrap">
+      <div class="foreign-track" id="fTrack">
+
+        <div class="fcard">
+          <div class="fcard-img">
+            <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=500&q=80" alt="Париж"/>
+            <div class="fcard-pin"></div>
+          </div>
+          <div class="fcard-body">
+            <h3>🇫🇷 Париж, Франция</h3>
+            <p>Париж — город романтики и искусства. Прогулки по улочкам и виды на Эйфелеву башню.</p>
+          </div>
+        </div>
+
+        <div class="fcard">
+          <div class="fcard-img">
+            <img src="https://images.unsplash.com/photo-1522083165195-3424ed129620?w=500&q=80" alt="Нью-Йорк"/>
+            <div class="fcard-pin"></div>
+          </div>
+          <div class="fcard-body">
+            <h3>🇺🇸 Нью-Йорк, США</h3>
+            <p>Нью-Йорк — город энергии и небоскрёбов. Таймс-сквер, Центральный парк и высота.</p>
+          </div>
+        </div>
+
+        <div class="fcard">
+          <div class="fcard-img">
+            <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=500&q=80" alt="Лондон"/>
+            <div class="fcard-pin"></div>
+          </div>
+          <div class="fcard-body">
+            <h3>🇬🇧 Лондон,<br>Великобритания</h3>
+            <p>Лондон — история и королевская атмосфера. Прогулки по Вестминстеру и музеи.</p>
+          </div>
+        </div>
+
+        <div class="fcard">
+          <div class="fcard-img">
+            <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=500&q=80" alt="Дубай"/>
+            <div class="fcard-pin"></div>
+          </div>
+          <div class="fcard-body">
+            <h3>🇦🇪 Дубай, ОАЭ</h3>
+            <p>Дубай — роскошь и яркие впечатления. Сафари, небоскрёбы и пляжный отдых.</p>
+          </div>
+        </div>
+
+        <div class="fcard">
+          <div class="fcard-img">
+            <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=500&q=80" alt="Рим"/>
+            <div class="fcard-pin"></div>
+          </div>
+          <div class="fcard-body">
+            <h3>🇮🇹 Рим, Италия</h3>
+            <p>Рим — город истории и культуры. Колизей, Ватикан и уютные улицы.</p>
+          </div>
+        </div>
+
+        <div class="fcard">
+          <div class="fcard-img">
+            <img src="https://images.unsplash.com/photo-1560969184-10fe8719e047?w=500&q=80" alt="Берлин"/>
+            <div class="fcard-pin"></div>
+          </div>
+          <div class="fcard-body">
+            <h3>🇩🇪 Берлин, Германия</h3>
+            <p>Берлин — история, искусство и современная культура в одном городе.</p>
+          </div>
+        </div>
+
+        <div class="fcard">
+          <div class="fcard-img">
+            <img src="https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=500&q=80" alt="Токио"/>
+            <div class="fcard-pin"></div>
+          </div>
+          <div class="fcard-body">
+            <h3>🇯🇵 Токио, Япония</h3>
+            <p>Токио — будущее уже здесь. Технологии, традиции и незабываемая кухня.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <button class="farrow fnext" id="fNext">&#8250;</button>
+  </div>
+</section>
+
+
+<section class="trending">
+  <div class="trending-header">
+    <h2 class="trending-title">Trending Destinations</h2>
+    <a href="#" class="trending-see-all">See all</a>
+  </div>
+
+  <div class="trending-grid">
+
+    <div class="tcard tcard-cruises">
+      <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80" alt="Cruises"/>
+      <div class="tcard-overlay"></div>
+      <span class="tcard-label">Cruises</span>
+    </div>
+
+    <div class="tcard tcard-beach">
+      <img src="https://images.unsplash.com/photo-1537956965359-7573183d1f57?w=800&q=80" alt="Beach Tours"/>
+      <div class="tcard-overlay"></div>
+      <span class="tcard-label">Beach Tours</span>
+    </div>
+
+    <div class="tcard tcard-city">
+      <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=600&q=80" alt="City Tours"/>
+      <div class="tcard-overlay"></div>
+      <span class="tcard-label">City Tours</span>
+    </div>
+
+    <div class="tcard tcard-museum">
+      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80" alt="Museum Tour"/>
+      <div class="tcard-overlay"></div>
+      <span class="tcard-label">Museum Tour</span>
+    </div>
+
+    <div class="tcard tcard-food">
+      <img src="https://images.unsplash.com/photo-1467377791767-c929b5dc9a23?w=600&q=80" alt="Food"/>
+      <div class="tcard-overlay"></div>
+      <span class="tcard-label">Food</span>
+    </div>
+
+    <div class="tcard tcard-hiking">
+      <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80" alt="Hiking"/>
+      <div class="tcard-overlay"></div>
+      <span class="tcard-label">Hiking</span>
+    </div>
+
+  </div>
+</section>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <h3 class="footer-logo">Travel</h3>
+      <p class="footer-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="#" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+        <a href="#" aria-label="Twitter">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Services</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Dentations</a></li>
+        <li><a href="#">Services</a></li>
+        <li><a href="#">Our Blog</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Instagram</h4>
+      <div class="footer-insta">
+        <a href="#"><img src="https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1519817650390-64a93db51149?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1467377791767-c929b5dc9a23?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=200&q=80" alt=""/></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Contact</h4>
+      <ul class="footer-contacts">
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Anyware, any rode, nr xyz, india</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>+91 9876543210</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>+91 9876543210</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom-bar">
+    <p>traveltoor©2024 all right reserve</p>
+  </div>
+</footer>
+
+<script>
+  /* Burger */
+  const burger = document.getElementById('burger');
+  const drawer = document.getElementById('drawer');
+  burger.addEventListener('click', () => {
+    const open = drawer.classList.toggle('open');
+    burger.classList.toggle('open', open);
+  });
+
+  /* Foreign slider */
+  const fTrack = document.getElementById('fTrack');
+  const fPrev  = document.getElementById('fPrev');
+  const fNext  = document.getElementById('fNext');
+  const fCards = fTrack.querySelectorAll('.fcard');
+  let fCur = 0;
+
+  function fVis() {
+    return window.innerWidth <= 640 ? 1 : window.innerWidth <= 1000 ? 3 : 5;
+  }
+
+  function fLayout() {
+    const vc = fVis(), gap = 20;
+    const w  = (fTrack.parentElement.offsetWidth - gap * (vc - 1)) / vc;
+    fCards.forEach(c => { c.style.flex = `0 0 ${w}px`; });
+    fCur = 0;
+    fTrack.style.transform = 'translateX(0)';
+  }
+
+  function fGo(dir) {
+    const vc = fVis(), gap = 20;
+    const max = fCards.length - vc;
+    fCur = Math.max(0, Math.min(fCur + dir, max));
+    const w = fCards[0].getBoundingClientRect().width;
+    fTrack.style.transform = `translateX(-${fCur * (w + gap)}px)`;
+  }
+
+  fPrev.addEventListener('click', () => fGo(-1));
+  fNext.addEventListener('click', () => fGo(1));
+  fLayout();
+  window.addEventListener('resize', fLayout);
+</script>
+</body>
+</html>

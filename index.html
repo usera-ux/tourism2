@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BMC Tourism — туристская сеть</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #111111;
+      --white: #ffffff;
+      --orange: #FFA03F;
+    }
+
+    html, body {
+      background: var(--white);
+      color: var(--black);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    /* ══ NAV ══ */
+    nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      height: 70px;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 56px;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(8px);
+    }
+
+    .logo { display: flex; flex-direction: column; line-height: 1.2; }
+    .logo-main { font-size: 17px; font-weight: 800; letter-spacing: -0.2px; color: var(--black); }
+    .logo-main em { font-style: normal; color: var(--orange); }
+    .logo-sub { font-size: 10px; font-weight: 500; color: #aaa; margin-top: 1px; }
+
+    .nav-links {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 38px; list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none; color: var(--black);
+      font-size: 15px; font-weight: 600; letter-spacing: -0.1px;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--orange); }
+
+    .burger {
+      display: flex; flex-direction: column; gap: 5px; cursor: pointer;
+      padding: 6px; border: none; background: none;
+    }
+    .burger span {
+      display: block; height: 2.5px; background: var(--black); border-radius: 2px;
+      transition: transform 0.25s, opacity 0.25s, width 0.25s;
+    }
+    .burger span:first-child { width: 26px; }
+    .burger span:last-child  { width: 18px; }
+    .burger.open span:first-child { width: 26px; transform: translateY(7.5px) rotate(45deg); }
+    .burger.open span:last-child  { width: 26px; transform: translateY(-7.5px) rotate(-45deg); }
+
+    .mobile-drawer {
+      display: none;
+      position: fixed;
+      top: 70px; left: 0; right: 0;
+      background: var(--white);
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+      padding: 24px 28px;
+      z-index: 190;
+      flex-direction: column;
+      gap: 0;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .mobile-drawer.open { display: flex; }
+    .mobile-drawer a {
+      text-decoration: none; color: var(--black);
+      font-size: 17px; font-weight: 600;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      transition: color 0.15s;
+    }
+    .mobile-drawer a:last-child { border-bottom: none; }
+    .mobile-drawer a:hover { color: var(--orange); }
+
+    /* ══ HERO ══ */
+    .hero {
+      min-height: 100vh;
+      padding-top: 70px;
+      display: grid;
+      grid-template-columns: 45% 55%;
+      align-items: center;
+      padding-left: 56px;
+      overflow: hidden;
+    }
+
+    .hero-left {
+      padding-right: 32px;
+      padding-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.1s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+
+    h1 {
+      font-size: clamp(72px, 10vw, 110px);
+      font-weight: 800;
+      line-height: 0.9;
+      letter-spacing: -5px;
+      color: var(--black);
+      margin-bottom: 32px;
+    }
+
+    .underlined { position: relative; display: inline-block; }
+    .underlined::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: -5px;
+      width: 100%; height: 5px;
+      background: var(--orange);
+      border-radius: 3px;
+    }
+
+    .hero-desc {
+      font-size: 15px; font-weight: 400;
+      line-height: 1.62; color: #555;
+      max-width: 370px;
+    }
+
+    .hero-right {
+      position: relative;
+      height: calc(100vh - 70px);
+      min-height: 560px;
+    }
+
+    .plane-svg {
+      position: absolute; top: 30px; right: 40px;
+      width: 185px; height: 145px;
+      z-index: 4; pointer-events: none;
+    }
+    @keyframes driftPlane {
+      0%,100% { transform: translate(0,0) rotate(-12deg); }
+      50%      { transform: translate(6px,-7px) rotate(-6deg); }
+    }
+    .plane-icon { animation: driftPlane 4s ease-in-out infinite; }
+
+    .pcard {
+      position: absolute;
+      border-radius: 20px; overflow: hidden;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.14);
+    }
+    .pcard img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.5s ease;
+    }
+    .pcard:hover img { transform: scale(1.05); }
+
+    .c1 { width: 40%; aspect-ratio: 3/3.3; top: 5%; left: 7%; opacity: 0; animation: cardIn 0.85s 0.35s cubic-bezier(0.22,1,0.36,1) forwards; }
+    .c2 { width: 40%; aspect-ratio: 3/3.3; bottom: 4%; left: 7%; opacity: 0; animation: cardIn 0.85s 0.55s cubic-bezier(0.22,1,0.36,1) forwards; }
+    .c3 { width: 46%; aspect-ratio: 3/4.5; top: 10%; right: 2%; opacity: 0; animation: cardIn 0.85s 0.45s cubic-bezier(0.22,1,0.36,1) forwards; }
+
+    /* ══ DESTINATIONS ══ */
+    .destinations { padding: 80px 56px 100px; position: relative; }
+
+    .dest-label { font-size: 13px; font-weight: 600; color: var(--orange); letter-spacing: 0.2px; margin-bottom: 10px; }
+
+    .dest-heading { font-size: clamp(32px, 4vw, 48px); font-weight: 800; letter-spacing: -1.5px; margin-bottom: 48px; }
+    .dest-heading em { font-style: normal; color: var(--orange); }
+
+    .slider-wrap { position: relative; }
+    .slider-track { display: flex; gap: 28px;  }
+
+    .arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--orange); color: white; border: none;
+      font-size: 20px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10; box-shadow: 0 4px 16px rgba(232,100,10,0.35);
+      transition: background 0.2s, transform 0.15s; user-select: none;
+    }
+    .arrow:hover { background: #c9530a; transform: translateY(-50%) scale(1.08); }
+    .arrow.prev { left: -24px; }
+    .arrow.next { right: -24px; }
+
+    .dest-card {
+     flex: 0 0 auto;
+     max-width: 380px;
+      background: var(--white); border-radius: 20px; overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .dest-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(0,0,0,0.13); }
+
+    .dest-img-wrap { position: relative; width: 100%; aspect-ratio: 4/3; overflow: hidden; border-radius: 16px; }
+    .dest-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
+    .dest-card:hover .dest-img-wrap img { transform: scale(1.05); }
+
+    .dest-rating {
+      position: absolute; bottom: 10px; left: 12px;
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.92); border-radius: 100px;
+      padding: 4px 10px; font-size: 13px; font-weight: 700;
+    }
+    .dest-rating .star { color: var(--orange); font-size: 14px; }
+    .dest-rating .count { color: #999; font-weight: 500; }
+
+    .dest-card-body { padding: 18px 20px 22px; }
+    .dest-card-body h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 8px; }
+    .dest-card-body p { font-size: 13.5px; color: #777; line-height: 1.55; font-weight: 400; }
+
+    .slider-dots { display: flex; justify-content: center; gap: 8px; margin-top: 36px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: #ddd; border: none; cursor: pointer; transition: background 0.2s, transform 0.2s; padding: 0; }
+    .dot.active { background: var(--orange); transform: scale(1.25); }
+
+    /* ══ INVEST SECTION ══ */
+    .invest-section {
+      background: #f4f4f6;
+      padding: 80px 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .invest-card {
+      border-radius: 24px;
+      max-width: 1440px;
+      width: 100%;
+      padding: 56px 60px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .invest-card-left { display: flex; flex-direction: column; gap: 32px; }
+
+    .invest-tag { font-size: 13px; font-weight: 600; color: var(--orange); letter-spacing: 0.04em; }
+
+    .invest-title {
+      font-size: clamp(28px, 3.5vw, 54px); font-weight: 800;
+      color: var(--black); line-height: 1.1; max-width: 860px;
+      letter-spacing: -1px;
+    }
+
+    .invest-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 40px; }
+    .invest-stat { display: flex; align-items: center; gap: 16px; }
+
+    .invest-stat-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: rgba(232,100,10,0.1);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .invest-stat-icon svg { width: 24px; height: 24px; }
+
+    .invest-stat-value { font-size: 18px; font-weight: 800; color: var(--black); line-height: 1.1; }
+    .invest-stat-label { font-size: 12.5px; color: #aaa; margin-top: 3px; }
+
+    /* last stat full width */
+    .invest-stat:last-child { grid-column: 1 / -1; }
+
+    .invest-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--orange); color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px; font-weight: 700;
+      border: none; border-radius: 12px;
+      padding: 18px 56px; cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      align-self: flex-start;
+    }
+    .invest-btn:hover { background: #c9530a; transform: translateY(-2px); }
+
+    /* Right — two stacked cards + feedback widget */
+    .invest-card-right {
+      position: relative;
+      width: 340px; height: 420px;
+      flex-shrink: 0;
+    }
+
+    /* grey back card */
+    .invest-card-back {
+      position: absolute; top: 12px; right: 0;
+      width: 290px; height: 390px;
+      border-radius: 32px;
+      background: #e2e2e6;
+    }
+
+    /* photo front card */
+    .invest-photo {
+      position: absolute; top: 0; left: 0;
+      width: 280px; height: 378px;
+      border-radius: 32px; overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.16);
+      z-index: 2;
+    }
+    .invest-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* feedback widget */
+    .invest-feedback {
+      position: absolute; bottom: -4px; right: -10px;
+      background: #fff; border-radius: 18px;
+      padding: 14px 18px 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+      min-width: 210px; z-index: 4;
+    }
+    .invest-feedback p { font-size: 13.5px; font-weight: 700; color: var(--black); margin-bottom: 10px; }
+    .invest-feedback-emojis { display: flex; gap: 6px; }
+    .inv-emoji {
+      font-size: 26px; cursor: pointer;
+      transition: transform 0.15s; user-select: none;
+      background: none; border: none; padding: 0; line-height: 1;
+    }
+    .inv-emoji:hover { transform: scale(1.3); }
+    .inv-emoji.active { transform: scale(1.35); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+
+    /* ══ WHY US SECTION ══ */
+    .why-section {
+      padding: 80px 56px 100px;
+      background: #fff;
+    }
+    .why-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .why-left { display: flex; flex-direction: column; gap: 12px; }
+    .why-label {
+      font-size: 13px; font-weight: 600;
+      color: var(--orange); letter-spacing: 0.1px;
+    }
+    .why-title {
+      font-size: clamp(32px, 3.5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.05;
+      color: #1a2e1a;
+    }
+    .why-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .why-card {
+      background: #fff;
+      border: 1.5px solid #f0f0f0;
+      border-radius: 20px;
+      padding: 28px 24px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      transition: box-shadow 0.25s, transform 0.25s;
+    }
+    .why-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 24px; right: 24px;
+      height: 3px;
+      background: var(--orange);
+      border-radius: 2px;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    .why-card:hover {
+      box-shadow: 0 12px 40px rgba(0,0,0,0.09);
+      transform: translateY(-4px);
+    }
+    .why-card:hover::after { opacity: 1; }
+
+    .why-icon {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--orange);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .why-icon svg { width: 28px; height: 28px; }
+
+    .why-card h3 {
+      font-size: 17px; font-weight: 700;
+      color: var(--black); letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+    .why-card p {
+      font-size: 13.5px; color: #888;
+      line-height: 1.55; font-weight: 400;
+    }
+
+    @media (max-width: 900px) {
+      .why-section { padding: 60px 20px 80px; }
+      .why-inner { grid-template-columns: 1fr; gap: 36px; }
+      .why-cards { grid-template-columns: 1fr; }
+    }
+
+    /* ══ CTA SECTION ══ */
+    .cta-section {
+      background: #fff;
+      padding: 60px 56px 80px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 380px;
+    }
+
+    /* deco wrapper — path + plane icon together */
+    .cta-deco {
+      position: absolute;
+      pointer-events: none;
+    }
+    .cta-deco--left {
+      left: -20px;
+      top: -20px;
+      width: 207px;
+      height: 320px;
+    }
+    .cta-deco--right {
+      right: -20px;
+      top: -20px;
+      width: 207px;
+      height: 320px;
+    }
+
+    /* path SVG fills the deco container */
+    .cta-path-left,
+    .cta-path-right {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+
+    /* plane icon pinned at top of path */
+    .cta-plane-icon--left {
+      position: absolute;
+      top: -10px;
+      left: 50px;
+    }
+    .cta-plane-icon--right {
+      position: absolute;
+      top: -10px;
+      right: 10px;
+    }
+
+    .cta-inner {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 1000px;
+    }
+
+    .cta-title {
+      font-size: clamp(26px, 3.2vw, 44px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.18;
+      color: var(--black);
+      margin-bottom: 44px;
+    }
+
+    .cta-btns {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .cta-btn-primary {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--orange);
+      color: #fff;
+      font-size: 16px; font-weight: 700;
+      padding: 18px 52px;
+      border-radius: 12px;
+      text-decoration: none;
+      border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .cta-btn-primary:hover { background: #c9530a; transform: translateY(-2px); }
+
+    .cta-btn-ghost {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(232,100,10,0.13);
+      color: var(--orange);
+      font-size: 16px; font-weight: 700;
+      padding: 18px 52px;
+      border-radius: 12px;
+      text-decoration: none;
+      border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .cta-btn-ghost:hover { background: rgba(232,100,10,0.22); transform: translateY(-2px); }
+
+    @media (max-width: 860px) {
+      .cta-section { padding: 60px 20px 80px; }
+      .cta-deco { display: none; }
+      .cta-title { font-size: 24px; }
+      .cta-btns { flex-direction: column; align-items: center; }
+      .cta-btn-primary, .cta-btn-ghost { width: 100%; max-width: 320px; }
+    }
+
+    /* ══ FOOTER ══ */
+    .site-footer {
+      background: #f5a623;
+      color: #fff;
+    }
+    .footer-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 64px 56px 48px;
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr 1.2fr 1fr;
+      gap: 48px;
+    }
+
+    /* Brand col */
+    .footer-logo {
+      font-size: 28px; font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+      color: #fff;
+    }
+    .footer-desc {
+      font-size: 14px; line-height: 1.65;
+      color: rgba(255,255,255,0.85);
+      max-width: 280px;
+      margin-bottom: 28px;
+    }
+    .footer-socials {
+      display: flex; gap: 20px;
+    }
+    .footer-socials a {
+      color: #fff;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.2s;
+    }
+    .footer-socials a:hover { opacity: 0.7; }
+    .footer-socials svg { width: 24px; height: 24px; }
+
+    /* Generic col */
+    .footer-col-title {
+      font-size: 18px; font-weight: 700;
+      color: #fff;
+      margin-bottom: 20px;
+      letter-spacing: -0.2px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .footer-col a {
+      text-decoration: none;
+      color: rgba(255,255,255,0.88);
+      font-size: 14.5px; font-weight: 500;
+      transition: color 0.15s;
+    }
+    .footer-col a:hover { color: #fff; }
+
+    /* Instagram grid */
+    .footer-insta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .footer-insta a {
+      display: block;
+      aspect-ratio: 1;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .footer-insta img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.4s;
+    }
+    .footer-insta a:hover img { transform: scale(1.08); }
+
+    /* Contact list */
+    .footer-contacts { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+    .footer-contacts li {
+      display: flex; align-items: flex-start; gap: 12px;
+      color: rgba(255,255,255,0.9);
+      font-size: 14.5px; font-weight: 500;
+    }
+    .footer-contacts svg {
+      width: 20px; height: 20px;
+      flex-shrink: 0; margin-top: 1px;
+      color: #fff;
+    }
+
+    /* Bottom bar */
+    .footer-bottom-bar {
+      background: rgba(0,0,0,0.08);
+      text-align: center;
+      padding: 18px 56px;
+    }
+    .footer-bottom-bar p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      font-weight: 500;
+    }
+
+    @media (max-width: 1000px) {
+      .footer-inner { grid-template-columns: 1fr 1fr; padding: 48px 20px 36px; }
+    }
+    @media (max-width: 600px) {
+      .footer-inner { grid-template-columns: 1fr; gap: 36px; }
+      .footer-bottom-bar { padding: 16px 20px; }
+    }
+
+    /* ══ KEYFRAMES ══ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(40px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 860px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none !important; }
+      .hero { grid-template-columns: 1fr; padding: 88px 20px 40px; min-height: auto; gap: 40px; }
+      h1 { font-size: 60px; letter-spacing: -2px; }
+      .hero-right { height: 380px; }
+      .c1 { width: 145px; height: 178px; top: 20px; left: 8px; aspect-ratio: unset; }
+      .c2 { width: 145px; height: 150px; bottom: unset; top: 212px; left: 8px; aspect-ratio: unset; }
+      .c3 { width: 175px; height: 300px; top: 46px; right: 8px; aspect-ratio: unset; }
+      .plane-svg { width: 130px; right: 10px; top: 10px; }
+      .destinations { padding: 60px 20px 80px; }
+      .dest-card { flex: 0 0 80%; }
+      .arrow.prev { left: -10px; }
+      .arrow.next { right: -10px; }
+      .invest-section { padding: 60px 20px; }
+      .invest-card { grid-template-columns: 1fr; padding: 36px 24px; }
+      .invest-card-right { width: 100%; height: 320px; }
+      .invest-card-back { width: 220px; height: 290px; }
+      .invest-photo { width: 210px; height: 280px; }
+    }
+  </style>
+</head>
+<body>
+
+
+<nav>
+  <div class="logo">
+    <div class="logo-main">BMC<em>Tourism</em></div>
+    <div class="logo-sub">туристская сеть</div>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="./">Главная</a></li>
+    <li><a href="./direction-3.html">Направления</a></li>
+    <li><a href="./abroad-4.html">Отели</a></li>
+    <li><a href="./investment-5.html">Инвестиции</a></li>
+    <li><a href="./region-2.html">О нас</a></li>
+  </ul>
+  <button class="burger" id="burger" aria-label="Меню">
+    <span></span><span></span>
+  </button>
+</nav>
+
+<nav class="mobile-drawer" id="drawer">
+  <a href="./">Главная</a>
+  <a href="./direction-3.html">Направления</a>
+  <a href="./abroad-4.html">Отели</a>
+  <a href="./investment-5.html">Инвестиции</a>
+  <a href="./region-2.html">О нас</a>
+</nav>
+
+
+<section class="hero">
+  <div class="hero-left">
+    <h1>
+      <span class="underlined">Открой</span><br>
+      Казахстан<br>
+      по&#8209;новому
+    </h1>
+    <p class="hero-desc">
+      Путешествуйте по самым красивым местам<br>
+      страны и инвестируйте в перспективные<br>
+      туристические проекты.
+    </p>
+  </div>
+  <div class="hero-right">
+    <svg class="plane-svg" viewBox="0 0 186 139" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1 131.6 C0 89.9 16.7 26 86.2 62.2 C108.2 73.6 125.9 92.5 135.9 115.2 C137 117.8 138 120.2 138.8 122.6 C152.7 163.3 81.6 109.5 78.7 66.7 C75.2 16.2 102.9 -23.2 184.7 18.5"
+        stroke="#111111" stroke-opacity="0.72" stroke-width="1.8" stroke-dasharray="8 7" stroke-linecap="round"/>
+      <g class="plane-icon" transform="translate(178,14) rotate(-30)">
+        <path d="M0 0 L-18 6 L-14 0 L-18 -6 Z" fill="#111111"/>
+        <path d="M-9 -1 L-20 -12 L-18 -1 L-20 10 Z" fill="#111111"/>
+        <path d="M-15 3 L-20 8 L-18 3 Z" fill="#111111"/>
+      </g>
+    </svg>
+    <div class="pcard c1"><img src="./images/index-images/koktobe.png" alt="Подъёмник" /></div>
+    <div class="pcard c2"><img src="./images/index-images/flag.png" alt="Флаг" /></div>
+    <div class="pcard c3"><img src="./images/index-images/nature.png" alt="Озеро" /></div>
+  </div>
+</section>
+
+
+<section class="destinations" id="destinations">
+  <p class="dest-label">Куда поехать</p>
+  <h2 class="dest-heading">Популярные <em>направления</em></h2>
+  <div class="slider-wrap">
+    <button class="arrow prev" id="prevBtn">&#8249;</button>
+    <div class="slider-track" id="sliderTrack">
+      <div class="dest-card">
+        <div class="dest-img-wrap">
+          <img src="./images/index-images/burabai.png" alt="Бурабай" />
+          <div class="dest-rating"><span class="star">★</span><span>4.0</span><span class="count">(23)</span><span>😊</span></div>
+        </div>
+        <div class="dest-card-body"><h3>Бурабай</h3><p>Живописные озёра, сосновые леса и комфортные курорты для отдыха круглый год.</p></div>
+      </div>
+      <div class="dest-card">
+        <div class="dest-img-wrap">
+          <img src="./images/index-images/sharyn.png  " alt="Чарын" />
+          <div class="dest-rating"><span class="star">★</span><span>4.5</span><span class="count">(32)</span><span>😍</span></div>
+        </div>
+        <div class="dest-card-body"><h3>Чарынский каньон</h3><p>Уникальный природный памятник с захватывающими видами и маршрутами для туризма.</p></div>
+      </div>
+      <div class="dest-card">
+        <div class="dest-img-wrap">
+          <img src="./images/index-images/shymbulak.png" alt="Шымбулак" />
+          <div class="dest-rating"><span class="star">★</span><span>4.7</span><span class="count">(42)</span><span>🤩</span></div>
+        </div>
+        <div class="dest-card-body"><h3>Шымбулақ</h3><p>Горные озёра с кристально чистой водой и невероятной природой.</p></div>
+      </div>
+      <div class="dest-card">
+        <div class="dest-img-wrap">
+          <img src="./images/index-images/nature.png" alt="Кольсай" />
+          <div class="dest-rating"><span class="star">★</span><span>4.8</span><span class="count">(58)</span><span>😍</span></div>
+        </div>
+        <div class="dest-card-body"><h3>Кольсайские озёра</h3><p>Жемчужина Тянь-Шаня — три высокогорных озера среди еловых лесов.</p></div>
+      </div>
+      <div class="dest-card">
+        <div class="dest-img-wrap">
+          <img src="./images/akmola.png" alt="Актау" />
+          <div class="dest-rating"><span class="star">★</span><span>4.3</span><span class="count">(19)</span><span>😊</span></div>
+        </div>
+        <div class="dest-card-body"><h3>Актау и Каспий</h3><p>Каспийское побережье, меловые горы Мангистау и древние некрополи.</p></div>
+      </div>
+      <div class="dest-card">
+        <div class="dest-img-wrap">
+          <img src="./images/akmola.png" alt="Туркестан" />
+          <div class="dest-rating"><span class="star">★</span><span>4.6</span><span class="count">(37)</span><span>🤩</span></div>
+        </div>
+        <div class="dest-card-body"><h3>Туркестан</h3><p>Древний город с мавзолеем Ходжа Ахмета Ясауи — жемчужина Великого шёлкового пути.</p></div>
+      </div>
+      
+    </div>
+    <button class="arrow next" id="nextBtn">&#8250;</button>
+  </div>
+  <div class="slider-dots" id="dots"></div>
+</section>
+
+
+<section class="invest-section" id="invest">
+  <div class="invest-card">
+
+    <div class="invest-card-left">
+      <span class="invest-tag">Инвестиционые проекты</span>
+      <h2 class="invest-title">Эко-курорт в Алматинской области</h2>
+
+      <div class="invest-stats">
+        <div class="invest-stat">
+          <div class="invest-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="#e8640a" stroke-width="2"/>
+              <path d="M9 12l2 2 4-4" stroke="#e8640a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="invest-stat-value">2 000 000 $</div>
+            <div class="invest-stat-label">Требуемые инвестиции</div>
+          </div>
+        </div>
+        <div class="invest-stat">
+          <div class="invest-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="4" width="18" height="16" rx="3" stroke="#e8640a" stroke-width="2"/>
+              <path d="M3 9h18" stroke="#e8640a" stroke-width="2"/>
+              <path d="M8 2v4M16 2v4" stroke="#e8640a" stroke-width="2" stroke-linecap="round"/>
+              <path d="M9 14l2 2 4-3" stroke="#e8640a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="invest-stat-value">18% годовых</div>
+            <div class="invest-stat-label">Ожидаемая доходность</div>
+          </div>
+        </div>
+        <div class="invest-stat">
+          <div class="invest-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="7" cy="17" r="2" stroke="#e8640a" stroke-width="2"/>
+              <circle cx="17" cy="7" r="2" stroke="#e8640a" stroke-width="2"/>
+              <path d="M7 15V11a5 5 0 0 1 5-5h3" stroke="#e8640a" stroke-width="2" stroke-linecap="round"/>
+              <path d="M17 9v4a5 5 0 0 1-5 5H9" stroke="#e8640a" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="invest-stat-value">3 года</div>
+            <div class="invest-stat-label">Срок окупаемости</div>
+          </div>
+        </div>
+      </div>
+
+      <a href="./zayavka-6.html" class="invest-btn">Инвестировать</a>
+    </div>
+
+    <div class="invest-card-right">
+      <div class="invest-card-back"></div>
+      <div class="invest-photo">
+        <img src="./images/index-images/image.png" alt="Яхта" />
+      </div>
+      <div class="invest-feedback">
+        <p>How Your Experience?</p>
+        <div class="invest-feedback-emojis">
+          <button class="inv-emoji" onclick="pickEmoji(this)">😡</button>
+          <button class="inv-emoji" onclick="pickEmoji(this)">😕</button>
+          <button class="inv-emoji" onclick="pickEmoji(this)">🙂</button>
+          <button class="inv-emoji" onclick="pickEmoji(this)">😘</button>
+          <button class="inv-emoji" onclick="pickEmoji(this)">🤩</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<section class="why-section">
+  <div class="why-inner">
+    <div class="why-left">
+      <span class="why-label">Наши преимущества</span>
+      <h2 class="why-title">Почему инвесторы выбирают нас</h2>
+    </div>
+    <div class="why-cards">
+      <div class="why-card">
+        <div class="why-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="13" r="7" stroke="#fff" stroke-width="2"/>
+            <path d="M10 19c-3 1.5-5 4-5 7h22c0-3-2-5.5-5-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            <path d="M13 13l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 24c1-2 3-3.5 5-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="22" cy="10" r="3" stroke="#fff" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <h3>Надёжные проекты</h3>
+        <p>Все проекты проверены и поддерживаются государством.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="8" width="24" height="18" rx="3" stroke="#fff" stroke-width="2"/>
+            <path d="M4 13h24" stroke="#fff" stroke-width="2"/>
+            <circle cx="10" cy="20" r="2" fill="#fff"/>
+            <circle cx="16" cy="17" r="2" fill="#fff"/>
+            <circle cx="22" cy="19" r="2" fill="#fff"/>
+            <path d="M10 20 L16 17 L22 19" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M9 4v4M16 4v4M23 4v4" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Прозрачная статистика</h3>
+        <p>Вы всегда видите, куда идут ваши деньги и как растёт доход.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="5" width="22" height="16" rx="3" stroke="#fff" stroke-width="2"/>
+            <path d="M7 22l-4 5h22l-4-5" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M9 11h10M9 15h6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="26" cy="22" r="5" fill="#fff" fill-opacity="0.25" stroke="#fff" stroke-width="1.5"/>
+            <path d="M24 22l1.5 1.5L28 20" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>Поддержка инвесторов</h3>
+        <p>Круглосуточная поддержка и консультации по всем вопросам.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="cta-section">
+
+  
+  <div class="cta-deco cta-deco--left">
+    <svg width="207" height="320" viewBox="0 0 207 320" fill="none" xmlns="http://www.w3.org/2000/svg" class="cta-path-left">
+      <path d="M101.171 318.842C42.4207 291.727 -36.1321 222.744 79.4423 150.176C100.416 137.007 124.799 129.686 149.551 128.881C178.004 127.956 203.835 131.225 205.296 144.127C210.13 186.837 137.503 193.133 95.7564 182.901C8.27937 161.461 -52.833 93.3842 70.9215 0.800694" stroke="black" stroke-opacity="0.75" stroke-width="2" stroke-dasharray="9 9"/>
+    </svg>
+    <div class="cta-plane-icon cta-plane-icon--left">
+      <svg width="67" height="67" viewBox="0 0 67 67" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <rect x="11.5977" width="56.2135" height="56.2135" transform="rotate(11.9083 11.5977 0)" fill="url(#pl_left)" fill-opacity="0.75"/>
+        <defs>
+          <pattern id="pl_left" patternContentUnits="objectBoundingBox" width="1" height="1">
+            <use xlink:href="#img_plane_l" transform="scale(0.00195312)"/>
+          </pattern>
+          <image id="img_plane_l" width="512" height="512" preserveAspectRatio="none" xlink:href="data:image/png;base64,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"/>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
+  
+  <div class="cta-deco cta-deco--right">
+    <svg width="207" height="320" viewBox="0 0 207 320" fill="none" xmlns="http://www.w3.org/2000/svg" class="cta-path-right" style="transform:scaleX(-1)">
+      <path d="M101.171 318.842C42.4207 291.727 -36.1321 222.744 79.4423 150.176C100.416 137.007 124.799 129.686 149.551 128.881C178.004 127.956 203.835 131.225 205.296 144.127C210.13 186.837 137.503 193.133 95.7564 182.901C8.27937 161.461 -52.833 93.3842 70.9215 0.800694" stroke="black" stroke-opacity="0.75" stroke-width="2" stroke-dasharray="9 9"/>
+    </svg>
+    <div class="cta-plane-icon cta-plane-icon--right">
+      <svg width="67" height="67" viewBox="0 0 67 67" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <rect x="11.5977" width="56.2135" height="56.2135" transform="rotate(11.9083 11.5977 0)" fill="url(#pl_right)" fill-opacity="0.75"/>
+        <defs>
+          <pattern id="pl_right" patternContentUnits="objectBoundingBox" width="1" height="1">
+            <use xlink:href="#img_plane_r" transform="scale(0.00195312)"/>
+          </pattern>
+          <image id="img_plane_r" width="512" height="512" preserveAspectRatio="none" xlink:href="data:image/png;base64,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"/>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
+  <div class="cta-inner">
+    <h2 class="cta-title">Вы можете путешествовать и инвестировать<br>вместе с нами.</h2>
+    <div class="cta-btns">
+      <a href="./direction-3.html" class="cta-btn-primary">Начать путешествие</a>
+      <a href="./zayavka-6.html" class="cta-btn-ghost">Стать инвестором</a>
+    </div>
+  </div>
+</section>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+
+    
+    <div class="footer-brand">
+      <h3 class="footer-logo">BMC Tourism</h3>
+      <p class="footer-desc">Путешествуйте по самым красивым местам страны и инвестируйте в перспективные туристические проекты.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="#" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+        <a href="#" aria-label="Twitter">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    
+    <div class="footer-col">
+      <h4 class="footer-col-title">Services</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Направления</a></li>
+        <li><a href="#">Services</a></li>
+        <li><a href="#">Our Blog</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+
+    
+    <div class="footer-col">
+      <h4 class="footer-col-title">Instagram</h4>
+      <div class="footer-insta">
+        <a href="#"><img src="https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1519817650390-64a93db51149?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1467377791767-c929b5dc9a23?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=200&q=80" alt=""/></a>
+      </div>
+    </div>
+
+    
+    <div class="footer-col">
+      <h4 class="footer-col-title">Contact</h4>
+      <ul class="footer-contacts">
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Астана, Казахстан</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>+7 700 123 45 67</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>info@bmctourism.kz</span>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom-bar">
+    <p>BMC Tourism © 2026 — все права защищены</p>
+  </div>
+</footer>
+
+<script>
+  /* Burger */
+  const burger = document.getElementById('burger');
+  const drawer = document.getElementById('drawer');
+  burger.addEventListener('click', () => {
+    const open = drawer.classList.toggle('open');
+    burger.classList.toggle('open', open);
+  });
+
+  /* Slider */
+  const track    = document.getElementById('sliderTrack');
+  const prevBtn  = document.getElementById('prevBtn');
+  const nextBtn  = document.getElementById('nextBtn');
+  const dotsWrap = document.getElementById('dots');
+  const cards    = track.querySelectorAll('.dest-card');
+  let current    = 0;
+
+  function visibleCount() { return window.innerWidth <= 860 ? 1 : 3; }
+  function totalPages()   { return Math.ceil(cards.length / visibleCount()); }
+
+  function buildDots() {
+    dotsWrap.innerHTML = '';
+    for (let i = 0; i < totalPages(); i++) {
+      const d = document.createElement('button');
+      d.className = 'dot' + (i === current ? ' active' : '');
+      d.addEventListener('click', () => goTo(i));
+      dotsWrap.appendChild(d);
+    }
+  }
+  function updateDots() {
+    dotsWrap.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+  }
+  function goTo(page) {
+    current = Math.max(0, Math.min(page, totalPages() - 1));
+    const vc     = visibleCount();
+    const gap    = 28;
+    const cardW  = (track.parentElement.offsetWidth - gap * (vc - 1)) / vc;
+    const offset = current * (cardW + gap) * vc;
+    track.style.transform  = `translateX(-${offset}px)`;
+    track.style.transition = 'transform 0.45s cubic-bezier(0.22,1,0.36,1)';
+    updateDots();
+  }
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  function layout() {
+    const vc  = visibleCount();
+    const gap = 28;
+    const w   = (track.parentElement.offsetWidth - gap * (vc - 1)) / vc;
+    cards.forEach(c => { c.style.flex = `0 0 ${w}px`; });
+    current = 0;
+    track.style.transform = 'translateX(0)';
+    buildDots();
+  }
+  layout();
+  window.addEventListener('resize', layout);
+
+  /* Emoji picker */
+  function pickEmoji(el) {
+    document.querySelectorAll('.inv-emoji').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+</body>
+</html>

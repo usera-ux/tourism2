@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BMC Tourism — Красивые места Казахстана</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #111111;
+      --white: #ffffff;
+      --orange: #e8640a;
+    }
+    html, body {
+      background: var(--white);
+      color: var(--black);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ══ NAV ══ */
+    nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      height: 70px;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 56px;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(10px);
+    }
+    .logo { display: flex; flex-direction: column; line-height: 1.2; }
+    .logo-main { font-size: 17px; font-weight: 800; letter-spacing: -0.2px; color: var(--black); }
+    .logo-main em { font-style: normal; color: var(--orange); }
+    .logo-sub { font-size: 10px; font-weight: 500; color: #aaa; margin-top: 1px; }
+
+    .nav-links {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 38px; list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none; color: var(--black);
+      font-size: 15px; font-weight: 600; transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--orange); }
+    .nav-links li.active a { color: var(--black); font-weight: 700; }
+
+    /* plane + dashed arc — top right of nav */
+    .nav-deco {
+      position: absolute;
+      top: 12px; right: 80px;
+      width: 110px; height: 80px;
+      pointer-events: none;
+    }
+
+    .burger {
+      display: flex; flex-direction: column; gap: 5px; cursor: pointer;
+      padding: 6px; border: none; background: none;
+      position: relative; z-index: 1;
+    }
+    .burger span {
+      display: block; height: 2.5px; background: var(--black); border-radius: 2px;
+      transition: transform 0.25s, width 0.25s;
+    }
+    .burger span:first-child { width: 26px; }
+    .burger span:last-child  { width: 16px; }
+    .burger.open span:first-child { width: 26px; transform: translateY(7.5px) rotate(45deg); }
+    .burger.open span:last-child  { width: 26px; transform: translateY(-7.5px) rotate(-45deg); }
+
+    .mobile-drawer {
+      display: none; position: fixed;
+      top: 70px; left: 0; right: 0;
+      background: var(--white); border-bottom: 1px solid rgba(0,0,0,0.07);
+      padding: 24px 28px; z-index: 190;
+      flex-direction: column;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .mobile-drawer.open { display: flex; }
+    .mobile-drawer a {
+      text-decoration: none; color: var(--black);
+      font-size: 17px; font-weight: 600;
+      padding: 14px 0; border-bottom: 1px solid rgba(0,0,0,0.06);
+      transition: color 0.15s;
+    }
+    .mobile-drawer a:last-child { border-bottom: none; }
+    .mobile-drawer a:hover { color: var(--orange); }
+
+    /* ══ HERO ══ */
+    .hero {
+      margin-top: 70px;
+      position: relative;
+      width: 100%;
+      height: 500px;
+      min-height: 420px;
+      overflow: hidden;
+    }
+
+    /* background photo */
+    .hero-bg {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 60%;
+      display: block;
+    }
+
+    /* dark overlay */
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.42);
+    }
+
+    /* centered text */
+    .hero-content {
+      position: relative; z-index: 2;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 40px;
+      text-align: center;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.2s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+
+    .hero-title {
+      font-size: clamp(28px, 4.5vw, 58px);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -1px;
+      color: #fff;
+      max-width: 980px;
+    }
+
+    /* ══ DESTINATIONS ══ */
+    .destinations {
+      padding: 64px 56px 80px;
+      background: #fff;
+    }
+    .dest-label {
+      font-size: 13px; font-weight: 600;
+      color: var(--orange); margin-bottom: 8px;
+    }
+    .dest-heading {
+      font-size: clamp(28px, 3.5vw, 42px);
+      font-weight: 800; letter-spacing: -1px;
+      margin-bottom: 40px;
+    }
+    .dest-heading em { font-style: normal; color: var(--orange); }
+
+    .dest-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    .dcard {
+      background: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .dcard:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.13);
+    }
+
+    /* photo area */
+    .dcard-img {
+      position: relative;
+      width: 100%; aspect-ratio: 4/3;
+      overflow: hidden;
+      border-radius: 14px;
+    }
+    .dcard-img img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.5s ease;
+    }
+    .dcard:hover .dcard-img img { transform: scale(1.06); }
+
+    /* rating badge */
+    .dcard-rating {
+      position: absolute;
+      bottom: 10px; left: 10px;
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,0.92);
+      border-radius: 100px;
+      padding: 4px 10px;
+      font-size: 12px; font-weight: 700;
+      backdrop-filter: blur(4px);
+    }
+    .dcard-rating .star { color: var(--orange); font-size: 13px; }
+    .dcard-rating .cnt { color: #999; font-weight: 500; }
+
+    /* text body */
+    .dcard-body { padding: 14px 16px 18px; }
+    .dcard-body h3 {
+      font-size: 16px; font-weight: 800;
+      letter-spacing: -0.3px; margin-bottom: 7px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .dcard-body p {
+      font-size: 12.5px; color: #888;
+      line-height: 1.5; font-weight: 400;
+    }
+
+    @media (max-width: 1000px) {
+      .dest-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .destinations { padding: 48px 20px 60px; }
+      .dest-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ══ FOREIGN DESTINATIONS ══ */
+    .foreign {
+      padding: 64px 56px 80px;
+      background: #fff;
+    }
+    .foreign-label {
+      font-size: 13px; font-weight: 600;
+      color: var(--orange); margin-bottom: 8px;
+    }
+    .foreign-heading {
+      font-size: clamp(24px, 3vw, 38px);
+      font-weight: 800; letter-spacing: -0.8px;
+      margin-bottom: 36px; color: var(--black);
+    }
+
+    .foreign-slider {
+      position: relative;
+    }
+
+    .foreign-track-wrap {
+      overflow: hidden;
+    }
+
+    .foreign-track {
+      display: flex;
+      gap: 20px;
+      transition: transform 0.45s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    .fcard {
+      flex: 0 0 calc(20% - 16px);
+      cursor: pointer;
+    }
+
+    .fcard-img {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3/3.5;
+      border-radius: 18px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .fcard-img img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.5s ease;
+    }
+    .fcard:hover .fcard-img img { transform: scale(1.06); }
+
+    /* white circle "pin" top-center */
+    .fcard-pin {
+      position: absolute;
+      top: 14px; left: 90%; transform: translateX(-50%);
+      width: 22px; height: 22px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+
+    .fcard-body h3 {
+      font-size: 15px; font-weight: 800;
+      letter-spacing: -0.3px; margin-bottom: 7px;
+      color: var(--black); line-height: 1.2;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .fcard-body p {
+      font-size: 12.5px; color: #777;
+      line-height: 1.55; font-weight: 400;
+    }
+
+    /* arrows */
+    .farrow {
+      position: absolute;
+      top: calc(50% - 40px); /* center on image */
+      transform: translateY(-50%);
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--orange);
+      color: #fff; border: none;
+      font-size: 22px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10;
+      box-shadow: 0 4px 16px rgba(232,100,10,0.35);
+      transition: background 0.2s, transform 0.15s;
+      user-select: none;
+    }
+    .farrow:hover { background: #c9530a; transform: translateY(-50%) scale(1.08); }
+    .farrow.fprev { left: -22px; }
+    .farrow.fnext { right: -22px; }
+
+    @media (max-width: 1000px) {
+      .fcard { flex: 0 0 calc(33.333% - 14px); }
+    }
+    @media (max-width: 640px) {
+      .foreign { padding: 48px 20px 60px; }
+      .fcard { flex: 0 0 calc(80% - 10px); }
+      .farrow.fprev { left: -10px; }
+      .farrow.fnext { right: -10px; }
+    }
+
+    .hotel-section {
+      padding: 48px 56px 60px;
+      background: #fff;
+    }
+    .hotel-label {
+      font-size: 12px; font-weight: 600;
+      color: var(--orange); margin-bottom: 6px;
+    }
+    .hotel-heading {
+      font-size: clamp(20px, 2.4vw, 30px);
+      font-weight: 800; letter-spacing: -0.6px;
+      margin-bottom: 28px; color: var(--black);
+    }
+
+    .hotel-card {
+      max-width: 1545px;
+      height: 60%;
+      display: grid;
+      grid-template-columns: 46% 54%;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .hotel-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 28px 32px;
+      gap: 28px;
+      background: #FFA03F;
+      border-radius: 24px;
+      height: 60%;
+    }
+
+    .hotel-name-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    .hotel-name {
+      font-size: clamp(18px, 2vw, 26px);
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+
+    .hotel-price {
+      background: rgba(255,255,255,0.22);
+      border-radius: 8px;
+      padding: 6px 12px;
+      text-align: center;
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+    .hotel-price .from {
+      font-size: 10px; color: rgba(255,255,255,0.8);
+      font-weight: 500; display: block;
+    }
+    .hotel-price .amount {
+      font-size: 15px; font-weight: 800; color: #fff;
+    }
+
+    .hotel-desc {
+      font-size: 12.5px; color: rgba(255,255,255,0.88);
+      line-height: 1.6; font-weight: 400;
+    }
+
+    .hotel-book-btn {
+      display: block; width: 100%;
+      background: #fff;
+      color: #FFA03F;
+      font-size: 14px; font-weight: 700;
+      text-align: center;
+      padding: 14px;
+      border-radius: 10px;
+      border: none; cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .hotel-book-btn:hover { background: rgba(255,255,255,0.9); transform: translateY(-2px); }
+
+    .hotel-photos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 10px;
+      height: 60%;
+    }
+    .hotel-photos a {
+      display: block; border-radius: 14px; overflow: hidden;
+    }
+    .hotel-photos img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.5s ease;
+    }
+    .hotel-photos a:hover img { transform: scale(1.06); }
+
+    @media (max-width: 860px) {
+      .hotel-section { padding: 40px 20px 52px; }
+      .hotel-card { grid-template-columns: 1fr; height: auto; }
+      .hotel-info { height: auto; min-height: 280px; }
+      .hotel-photos { height: 280px; }
+    }
+
+    /* ══ RESTAURANTS ══ */
+    .resto-section {
+      padding: 48px 56px 64px;
+      background: #fff;
+      margin-top: -300px;
+    }
+    .resto-label {
+      font-size: 12px; font-weight: 600;
+      color: var(--orange); margin-bottom: 6px;
+    }
+    .resto-heading {
+      font-size: clamp(20px, 2.4vw, 30px);
+      font-weight: 800; letter-spacing: -0.6px;
+      margin-bottom: 28px; color: var(--black);
+    }
+
+    .resto-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .rcard {
+      background: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .rcard:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.13);
+    }
+
+    .rcard-img {
+      position: relative;
+      width: 100%; aspect-ratio: 4/3;
+      overflow: hidden;
+    }
+    .rcard-img img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.5s ease;
+    }
+    .rcard:hover .rcard-img img { transform: scale(1.06); }
+
+    /* category badge top-right */
+    .rcard-badge {
+      position: absolute;
+      top: 12px; right: 12px;
+      background: #FFA03F;
+      color: #fff;
+      font-size: 11px; font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 100px;
+    }
+
+    .rcard-body {
+      padding: 14px 16px 18px;
+    }
+    .rcard-location {
+      font-size: 12px; font-weight: 600;
+      color: var(--orange); margin-bottom: 5px;
+    }
+    .rcard-name {
+      font-size: 15px; font-weight: 800;
+      letter-spacing: -0.3px; color: var(--black);
+    }
+
+    @media (max-width: 1000px) {
+      .resto-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .resto-section { padding: 40px 20px 52px; }
+      .resto-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ══ FOOTER ══ */
+    .site-footer { background: #FFA03F; color: #fff; }
+    .footer-inner {
+      max-width: 1545px; margin: 0 auto;
+      padding: 56px 56px 40px;
+      display: grid;
+      grid-template-columns: 1.6fr 0.9fr 1.4fr 1.1fr;
+      gap: 40px;
+    }
+    .footer-logo {
+      font-size: 24px; font-weight: 800;
+      letter-spacing: -0.3px; margin-bottom: 14px; color: #fff;
+    }
+    .footer-desc {
+      font-size: 13px; line-height: 1.65;
+      color: rgba(255,255,255,0.88); max-width: 260px; margin-bottom: 24px;
+    }
+    .footer-socials { display: flex; gap: 18px; }
+    .footer-socials a {
+      color: #fff; display: flex; align-items: center;
+      justify-content: center; transition: opacity 0.2s;
+    }
+    .footer-socials a:hover { opacity: 0.7; }
+    .footer-socials svg { width: 22px; height: 22px; }
+
+    .footer-col-title {
+      font-size: 17px; font-weight: 700; color: #fff;
+      margin-bottom: 20px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 13px; }
+    .footer-col a {
+      text-decoration: none; color: rgba(255,255,255,0.88);
+      font-size: 14px; font-weight: 500; transition: color 0.15s;
+    }
+    .footer-col a:hover { color: #fff; }
+
+    .footer-insta {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    }
+    .footer-insta a { display: block; aspect-ratio: 1; border-radius: 10px; overflow: hidden; }
+    .footer-insta img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform 0.4s;
+    }
+    .footer-insta a:hover img { transform: scale(1.08); }
+
+    .footer-contacts { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+    .footer-contacts li {
+      display: flex; align-items: flex-start; gap: 12px;
+      color: rgba(255,255,255,0.92); font-size: 14px; font-weight: 500;
+    }
+    .footer-contacts svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+
+    .footer-bottom-bar {
+      background: rgba(0,0,0,0.07);
+      text-align: center; padding: 16px 56px;
+    }
+    .footer-bottom-bar p { font-size: 13px; color: rgba(255,255,255,0.75); }
+
+    @media (max-width: 1000px) {
+      .footer-inner { grid-template-columns: 1fr 1fr; padding: 40px 20px 28px; }
+    }
+    @media (max-width: 560px) {
+      .footer-inner { grid-template-columns: 1fr; }
+      .footer-bottom-bar { padding: 14px 20px; }
+    }
+
+    /* ══ KEYFRAMES ══ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 860px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none !important; }
+      .nav-deco { display: none; }
+      .hero-title { font-size: 28px; letter-spacing: -0.5px; }
+    }
+  </style>
+</head>
+<body>
+
+
+<nav>
+  <div class="logo">
+    <div class="logo-main">BMC<em>Tourism</em></div>
+    <div class="logo-sub">туристская сеть</div>
+  </div>
+
+  <ul class="nav-links">
+    <li class="active"><a href="./">Главная</a></li>
+    <li><a href="./direction-3.html">Направления</a></li>
+    <li><a href="./hotels">Отели</a></li>
+    <li><a href="./investment-5.html">Инвестиции</a></li>
+    <li><a href="./about">О нас</a></li>
+  </ul>
+
+  
+  <svg class="nav-deco" viewBox="0 0 110 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M100 8 C75 2, 25 8, 8 40 C0 58, 10 72, 25 76"
+      stroke="#111" stroke-opacity="0.4" stroke-width="1.6"
+      stroke-dasharray="6 5" stroke-linecap="round"/>
+    <g transform="translate(96,6) rotate(-30)">
+      <path d="M0 0 L-14 5 L-11 0 L-14 -5 Z" fill="#222"/>
+      <path d="M-7 -1 L-16 -9 L-14 -1 L-16 8 Z" fill="#222"/>
+      <path d="M-12 3 L-16 7 L-14 3 Z" fill="#222"/>
+    </g>
+  </svg>
+
+  <button class="burger" id="burger" aria-label="Меню">
+    <span></span><span></span>
+  </button>
+</nav>
+
+<nav class="mobile-drawer" id="drawer">
+  <a href="./index.html">Главная</a>
+  <a href="./direction-3.html">Направления</a>
+  <a href="./hotels.html">Отели</a>
+  <a href="./investment-5.html">Инвестиции</a>
+  <a href="./region-2.html">О нас</a>
+</nav>
+
+
+<section class="hero">
+  <img
+    class="hero-bg"
+    src="https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1600&q=85"
+    alt="Красивые места Казахстана"
+  />
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1 class="hero-title">
+      Красивые места Казахстана и<br>
+      лучшие направления для отдыха
+    </h1>
+  </div>
+</section>
+
+
+<section class="destinations">
+  <p class="dest-label">Куда поехать</p>
+  <h2 class="dest-heading">Популярные <em>направления</em></h2>
+
+  <div class="dest-grid">
+
+    <div class="dcard">
+      <div class="dcard-img">
+        <img src="./images/index-images/burabai.png" alt="Бурабай"/>
+        <div class="dcard-rating"><span class="star">★</span><span>4.0</span><span class="cnt">(23)</span><span>😊</span></div>
+      </div>
+      <div class="dcard-body">
+        <h3>Бурабай</h3>
+        <p>Живописные озёра, сосновые леса и комфортные курорты для отдыха круглый год.</p>
+      </div>
+    </div>
+
+    <div class="dcard">
+      <div class="dcard-img">
+        <img src="./images/index-images/sharyn.png" alt="Чарынский каньон"/>
+        <div class="dcard-rating"><span class="star">★</span><span>4.5</span><span class="cnt">(32)</span><span>😄</span></div>
+      </div>
+      <div class="dcard-body">
+        <h3>Чарынский каньон</h3>
+        <p>Уникальный природный памятник с захватывающими видами и маршрутами для туризма.</p>
+      </div>
+    </div>
+
+    <div class="dcard">
+      <div class="dcard-img">
+        <img src="./images/index-images/nature.png" alt="Кольсайские озёра"/>
+        <div class="dcard-rating"><span class="star">★</span><span>4.7</span><span class="cnt">(42)</span><span>🤩</span></div>
+      </div>
+      <div class="dcard-body">
+        <h3>Кольсайские озёра</h3>
+        <p>Горные озёра с кристально чистой водой и невероятной природой.</p>
+      </div>
+    </div>
+
+    <div class="dcard">
+      <div class="dcard-img">
+        <img src="./images/index-images/nature.png" alt="Үлкен Алматы көлі"/>
+        <div class="dcard-rating"><span class="star">★</span><span>4.7</span><span class="cnt">(42)</span><span>🤩</span></div>
+      </div>
+      <div class="dcard-body">
+        <h3>Үлкен Алматы көлі</h3>
+        <p>Горные озёра с кристально чистой водой и невероятной природой.</p>
+      </div>
+    </div>
+
+    <div class="dcard">
+      <div class="dcard-img">
+        <img src="./images/index-images/shymbulak.png" alt="Шымбұлақ"/>
+        <div class="dcard-rating"><span class="star">★</span><span>4.0</span><span class="cnt">(23)</span><span>😊</span></div>
+      </div>
+      <div class="dcard-body">
+        <h3>Шымбұлақ</h3>
+        <p>Живописные озёра, сосновые леса и комфортные курорты для отдыха круглый год.</p>
+      </div>
+    </div>
+
+    <div class="dcard">
+      <div class="dcard-img">
+        <img src="./images/index-images/koktobe.png" alt="Көк-Төбе"/>
+        <div class="dcard-rating"><span class="star">★</span><span>4.5</span><span class="cnt">(32)</span><span>😄</span></div>
+      </div>
+      <div class="dcard-body">
+        <h3>Көк-Төбе</h3>
+        <p>Уникальный природный памятник с захватывающими видами и маршрутами для туризма.</p>
+      </div>
+    </div>
+
+    <div class="dcard">
+      <div class="dcard-img">
+        <img src="https://images.unsplash.com/photo-1467377791767-c929b5dc9a23?w=600&q=80" alt="Түркістан Қожа Ахмет Я..."/>
+        <div class="dcard-rating"><span class="star">★</span><span>4.7</span><span class="cnt">(42)</span><span>🤩</span></div>
+      </div>
+      <div class="dcard-body">
+        <h3>Түркістан Қожа Ахмет Я...</h3>
+        <p>Горные озёра с кристально чистой водой и невероятной природой.</p>
+      </div>
+    </div>
+
+    <div class="dcard">
+      <div class="dcard-img">
+        <img src="https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=600&q=80" alt="Маңғыстау"/>
+        <div class="dcard-rating"><span class="star">★</span><span>4.7</span><span class="cnt">(42)</span><span>🤩</span></div>
+      </div>
+      <div class="dcard-body">
+        <h3>Маңғыстау</h3>
+        <p>Горные озёра с кристально чистой водой и невероятной природой.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<section class="foreign">
+  <p class="foreign-label">Лучшие направления</p>
+  <h2 class="foreign-heading">Лучшие зарубежные направления</h2>
+
+  <div class="foreign-slider">
+    <button class="farrow fprev" id="fPrev">&#8249;</button>
+
+    <div class="foreign-track-wrap">
+      <div class="foreign-track" id="fTrack">
+
+        <div class="fcard">
+          <div class="fcard-img">
+            <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=500&q=80" alt="Париж"/>
+            <div class="fcard-pin"></div>
+          </div>
+          <div class="fcard-body">
+            <h3>🇫🇷 Париж, Франция</h3>
+            <p>Париж — город романтики и искусства. Прогулки по улочкам и виды на Эйфелеву башню.</p>
+          </div>
+        </div>
+
+        <div class="fcard">
+          <div class="fcard-img">
+            <img src="https://images.unsplash.com/photo-1522083165195-3424ed129620?w=500&q=80" alt="Нью-Йорк"/>
+            <div class="fcard-pin"></div>
+          </div>
+          <div class="fcard-body">
+            <h3>🇺🇸 Нью-Йорк, США</h3>
+            <p>Нью-Йорк — город энергии и небоскрёбов. Таймс-сквер, Центральный парк и высота.</p>
+          </div>
+        </div>
+
+        <div class="fcard">
+          <div class="fcard-img">
+            <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=500&q=80" alt="Лондон"/>
+            <div class="fcard-pin"></div>
+          </div>
+          <div class="fcard-body">
+            <h3>🇬🇧 Лондон, Великобритания</h3>
+            <p>Лондон — история и королевская атмосфера. Прогулки по Вестминстеру и музеи.</p>
+          </div>
+        </div>
+
+        <div class="fcard">
+          <div class="fcard-img">
+            <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=500&q=80" alt="Дубай"/>
+            <div class="fcard-pin"></div>
+          </div>
+          <div class="fcard-body">
+            <h3>🇦🇪 Дубай, ОАЭ</h3>
+            <p>Дубай — роскошь и яркие впечатления. Сафари, небоскрёбы и пляжный отдых.</p>
+          </div>
+        </div>
+
+        <div class="fcard">
+          <div class="fcard-img">
+            <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=500&q=80" alt="Рим"/>
+            <div class="fcard-pin"></div>
+          </div>
+          <div class="fcard-body">
+            <h3>🇮🇹 Рим, Италия</h3>
+            <p>Рим — город истории и культуры. Колизей, Ватикан и уютные улицы.</p>
+          </div>
+        </div>
+
+        <div class="fcard">
+          <div class="fcard-img">
+            <img src="https://images.unsplash.com/photo-1560969184-10fe8719e047?w=500&q=80" alt="Берлин"/>
+            <div class="fcard-pin"></div>
+          </div>
+          <div class="fcard-body">
+            <h3>🇩🇪 Берлин, Германия</h3>
+            <p>Берлин — история, искусство и современная культура в одном городе.</p>
+          </div>
+        </div>
+
+        <div class="fcard">
+          <div class="fcard-img">
+            <img src="https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=500&q=80" alt="Токио"/>
+            <div class="fcard-pin"></div>
+          </div>
+          <div class="fcard-body">
+            <h3>🇯🇵 Токио, Япония</h3>
+            <p>Токио — будущее уже здесь. Технологии, традиции и незабываемая кухня.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <button class="farrow fnext" id="fNext">&#8250;</button>
+  </div>
+</section>
+
+
+<section class="hotel-section">
+  <p class="hotel-label">Лучший отель</p>
+  <h2 class="hotel-heading">Гостиницы для комфортного отдыха</h2>
+
+  <div class="hotel-card">
+
+    
+    <div class="hotel-info">
+      <div class="hotel-info-top">
+        <div class="hotel-name-row">
+          <h3 class="hotel-name">Rahat Palace<br>Hotel</h3>
+          <div class="hotel-price">
+            <span class="from">От</span>
+            <span class="amount">$200</span>
+          </div>
+        </div>
+        <p class="hotel-desc">
+          Расположенный в центре города Алматы, отель Rahat Palace Hotel предлагает высокий уровень сервиса и современный комфорт. Просторные номера с панорамными окнами, изысканный ресторан с национальной и европейской кухней, фитнес-зал и SPA-зона создают идеальные условия как для отдыха, так и для деловых поездок.
+        </p>
+      </div>
+      <a href="#" class="hotel-book-btn">Забронировать отель</a>
+    </div>
+
+    
+    <div class="hotel-photos">
+      <a href="#">
+        <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&q=80" alt="Вид сверху на бассейн"/>
+      </a>
+      <a href="#">
+        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80" alt="Санторини вид"/>
+      </a>
+      <a href="#">
+        <img src="https://images.unsplash.com/photo-1534430480872-3498386e7856?w=600&q=80" alt="Закат Санторини"/>
+      </a>
+      <a href="#">
+        <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&q=80" alt="Бассейн отеля"/>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+
+<section class="resto-section">
+  <p class="resto-label">Рестораны и кафе</p>
+  <h2 class="resto-heading">Лучшие места для еды, встреч и отдыха</h2>
+
+  <div class="resto-grid">
+
+    <div class="rcard">
+      <div class="rcard-img">
+        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80" alt="Coffee Room Café"/>
+        <span class="rcard-badge">Рестораны</span>
+      </div>
+      <div class="rcard-body">
+        <p class="rcard-location">Almaty, Kazakhstan</p>
+        <h3 class="rcard-name">Coffee Room Café</h3>
+      </div>
+    </div>
+
+    <div class="rcard">
+      <div class="rcard-img">
+        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80" alt="Green Garden Restaurant"/>
+        <span class="rcard-badge">Рестораны</span>
+      </div>
+      <div class="rcard-body">
+        <p class="rcard-location">Almaty, Kazakhstan</p>
+        <h3 class="rcard-name">Green Garden Restaurant</h3>
+      </div>
+    </div>
+
+    <div class="rcard">
+      <div class="rcard-img">
+        <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?w=600&q=80" alt="Sky Lounge Café"/>
+        <span class="rcard-badge">Кафе</span>
+      </div>
+      <div class="rcard-body">
+        <p class="rcard-location">Astana, Kazakhstan</p>
+        <h3 class="rcard-name">Sky Lounge Café</h3>
+      </div>
+    </div>
+
+    <div class="rcard">
+      <div class="rcard-img">
+        <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600&q=80" alt="Choco & Latte"/>
+        <span class="rcard-badge">Рестораны</span>
+      </div>
+      <div class="rcard-body">
+        <p class="rcard-location">Almaty, Kazakhstan</p>
+        <h3 class="rcard-name">Choco & Latte</h3>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<footer class="site-footer">
+  <div class="footer-inner">
+
+    <div>
+      <h3 class="footer-logo">Travel</h3>
+      <p class="footer-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="#" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+        <a href="#" aria-label="Twitter">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Services</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Dentations</a></li>
+        <li><a href="#">Services</a></li>
+        <li><a href="#">Our Blog</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Instagram</h4>
+      <div class="footer-insta">
+        <a href="#"><img src="https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1519817650390-64a93db51149?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1467377791767-c929b5dc9a23?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&q=80" alt=""/></a>
+        <a href="#"><img src="https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=200&q=80" alt=""/></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Contact</h4>
+      <ul class="footer-contacts">
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Anyware, any rode, nr xyz, india</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>+91 9876543210</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>+91 9876543210</span>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+  <div class="footer-bottom-bar">
+    <p>traveltoor©2024 all right reserve</p>
+  </div>
+</footer>
+
+<script>
+  /* Foreign slider */
+  const fTrack  = document.getElementById('fTrack');
+  const fPrev   = document.getElementById('fPrev');
+  const fNext   = document.getElementById('fNext');
+  const fCards  = fTrack.querySelectorAll('.fcard');
+  let fCurrent  = 0;
+
+  function fVisible() { return window.innerWidth <= 640 ? 1 : window.innerWidth <= 1000 ? 3 : 5; }
+
+  function fLayout() {
+    const vc  = fVisible();
+    const gap = 20;
+    const w   = (fTrack.parentElement.offsetWidth - gap * (vc - 1)) / vc;
+    fCards.forEach(c => { c.style.flex = `0 0 ${w}px`; });
+    fCurrent = 0;
+    fTrack.style.transform = 'translateX(0)';
+  }
+
+  function fGoTo(dir) {
+    const vc      = fVisible();
+    const gap     = 20;
+    const total   = fCards.length;
+    const maxPage = total - vc;
+    fCurrent = Math.max(0, Math.min(fCurrent + dir, maxPage));
+    const cardW   = fCards[0].getBoundingClientRect().width;
+    fTrack.style.transform = `translateX(-${fCurrent * (cardW + gap)}px)`;
+  }
+
+  fPrev.addEventListener('click', () => fGoTo(-1));
+  fNext.addEventListener('click', () => fGoTo(1));
+  fLayout();
+  window.addEventListener('resize', fLayout);
+  const drawer = document.getElementById('drawer');
+  burger.addEventListener('click', () => {
+    const open = drawer.classList.toggle('open');
+    burger.classList.toggle('open', open);
+  });
+</script>
+</body>
+</html>
